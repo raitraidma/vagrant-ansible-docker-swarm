@@ -8,6 +8,7 @@
 
 - name:   Join Docker Swarm
   become: true
+  ignore_errors: yes
   shell:  docker swarm join --token {{ swarm_worker_token.stdout }} {{ master_ip }}:{{ master_port }}
   tags:
     - worker_setup
