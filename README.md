@@ -6,9 +6,18 @@ Ansible's VM is created, so you do not have to install Ansible in your host mach
 
 `key.private` and `key.public` are used to enable Ansible to connecto to other machines - you can generate you own key pair.
 
+## Prerequisites
+* [VirtualBox](https://www.virtualbox.org/)
+* [Vagrant](https://www.vagrantup.com/)
+
 ## Create Docker Swarm
 
-Login to ansible's virtual machine (172.16.66.10:22 or 127.0.0.1:2210; `vagrant`:`vagrant`) and execute following command:
+Create VMs:
+```sh
+vagrant up
+```
+
+Login to Ansible's virtual machine (172.16.66.10:22 or 127.0.0.1:2210 with username `vagrant` and password `vagrant`; or `vagrant ssh`) and execute following commands:
 ```sh
 cd /vagrant
 ansible-playbook playbook.yml -i inventory -e @vars.yml
