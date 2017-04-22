@@ -1,0 +1,62 @@
+---
+
+- name: Get uname -r
+  shell: uname -r
+  ignore_errors: yes
+  register: uname_r
+
+- name: Get lsb_release -cs
+  shell: lsb_release -cs
+  ignore_errors: yes
+  register: lsb_release_cs
+
+- name:           Install packages
+  become:         true
+  apt:
+    name:         "{{ item }}"
+    state:        "present"
+    update_cache: true
+  with_items:
+    - linux-image-extra-{{ uname_r.stdout }}
+    - linux-image-extra-virtual
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - software-properties-common
+
+- name:             Add APT Key for Docker
+  become:           true
+  shell:            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+
+- name:           Add Docker repository
+  become:         true
+  apt_repository:
+    repo:         "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ lsb_release_cs.stdout }} stable"
+    filename:     docker
+    state:        present
+
+- name:           Install Docker
+  become:         true
+  apt:
+    name:         "{{ item }}"
+    state:        "present"
+    update_cache: true
+  with_items:
+    - docker-ce
+
+- name:    Add docker group
+  become:  true
+  group:
+    name:  docker
+    state: present
+  tags:
+     - user
+
+- name:     Add user vagrant to usergroup docker
+  become:   true
+  user:
+    name:   vagrant
+    groups: docker
+    append: yes
+  tags:
+     - user

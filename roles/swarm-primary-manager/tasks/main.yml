@@ -1,0 +1,12 @@
+---
+
+- name:    Initialise Docker Swarm
+  become:  true
+  shell:   docker swarm init --advertise-addr {{ master_ip }}
+
+- name:     Get docker swarm worker tokken
+  become:   true
+  register: swarm_worker_token
+  shell:    docker swarm join-token -q worker
+  tags:
+    - worker_setup

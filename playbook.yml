@@ -1,0 +1,13 @@
+---
+
+- hosts: all-nodes
+  roles:
+    - swarm-common
+
+- hosts: swarm-primary-manager
+  roles:
+    - swarm-primary-manager
+
+- hosts: swarm-workers
+  roles:
+    - swarm-worker

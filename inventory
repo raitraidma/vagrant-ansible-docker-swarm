@@ -1,0 +1,11 @@
+[all-nodes]
+172.16.66.11 ansible_user=vagrant ansible_ssh_port=22 ansible_ssh_private_key_file=~/.ssh/swarm
+172.16.66.12 ansible_user=vagrant ansible_ssh_port=22 ansible_ssh_private_key_file=~/.ssh/swarm
+172.16.66.13 ansible_user=vagrant ansible_ssh_port=22 ansible_ssh_private_key_file=~/.ssh/swarm
+
+[swarm-primary-manager]
+172.16.66.11 ansible_user=vagrant ansible_ssh_port=22 ansible_ssh_private_key_file=~/.ssh/swarm
+
+[swarm-workers]
+172.16.66.12 ansible_user=vagrant ansible_ssh_port=22 ansible_ssh_private_key_file=~/.ssh/swarm
+172.16.66.13 ansible_user=vagrant ansible_ssh_port=22 ansible_ssh_private_key_file=~/.ssh/swarm
