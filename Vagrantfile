@@ -1,8 +1,8 @@
 nodes = [
-  { :hostname => 'ansible',  :ip => '172.16.66.10', :ram => 1024, :ssh => 2210 },
-  { :hostname => 'swarm-node-1',  :ip => '172.16.66.11', :ram => 2048, :ssh => 2211 },
-  { :hostname => 'swarm-node-2',  :ip => '172.16.66.12', :ram => 2048, :ssh => 2212 },
-  { :hostname => 'swarm-node-3',  :ip => '172.16.66.13', :ram => 2048, :ssh => 2213 }
+  { :hostname => 'ansible',       :ip => '172.16.66.10', :ram => 512,  :cpus => 1, :ssh => 2210, :ports => {}},
+  { :hostname => 'swarm-node-1',  :ip => '172.16.66.11', :ram => 2048, :cpus => 1, :ssh => 2211, :ports => {9000 => 9000, 9001 => 9001, 9002 => 9002}},
+  { :hostname => 'swarm-node-2',  :ip => '172.16.66.12', :ram => 2048, :cpus => 1, :ssh => 2212, :ports => {}},
+  { :hostname => 'swarm-node-3',  :ip => '172.16.66.13', :ram => 2048, :cpus => 1, :ssh => 2213, :ports => {}}
 ]
 
 Vagrant.configure("2") do |config|
@@ -12,14 +12,24 @@ Vagrant.configure("2") do |config|
       nodeconfig.vm.box_url = "http://cloud-images.ubuntu.com/vagrant/trusty/current/trusty-server-cloudimg-amd64-vagrant-disk1.box"
       nodeconfig.vm.hostname = node[:hostname]
       nodeconfig.vm.network :private_network, ip: node[:ip], host_ip: "127.0.0.1"
-      memory = node[:ram] ? node[:ram] : 256;
+
+      node[:ports].each do |src,dest|
+        nodeconfig.vm.network :forwarded_port,
+          guest: dest,
+          host: src,
+          host_ip: "127.0.0.1",
+          auto_correct: true
+      end
+
       nodeconfig.vm.provider :virtualbox do |vb|
         vb.customize [
           "modifyvm", :id,
-          "--memory", memory.to_s,
-          "--cpus", "4"
+          "--name", node[:hostname],
+          "--memory", node[:ram].to_s,
+          "--cpus", node[:cpus].to_s
         ]
       end
+
       nodeconfig.vm.network :forwarded_port,
         guest: 22,
         host: node[:ssh],
