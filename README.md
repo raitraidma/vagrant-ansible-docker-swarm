@@ -8,6 +8,7 @@ Ansible's VM is created, so you do not have to install Ansible in your host mach
 
 ## Prerequisites
 * [VirtualBox](https://www.virtualbox.org/)
+* `vagrant plugin install vagrant-vbguest`
 * [Vagrant](https://www.vagrantup.com/)
 
 ## Create Docker Swarm
