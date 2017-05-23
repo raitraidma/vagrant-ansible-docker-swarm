@@ -4,7 +4,7 @@ This is an example, how to create Docker Swarm using Vagrant and Ansible.
 
 Ansible's VM is created, so you do not have to install Ansible in your host machine.
 
-`key.private` and `key.public` are used to enable Ansible to connecto to other machines - you can generate you own key pair.
+`key.private` and `key.public` are used to enable Ansible to connect to other machines - you can generate you own key pair.
 
 ## Prerequisites
 * [VirtualBox](https://www.virtualbox.org/)
@@ -46,16 +46,17 @@ cd /vagrant
 
 Run `docker stack services monitoring` and verify if all services have all replicas up and running. If not, then wait and look again.
 
-Create database to InfluxDB:
+#### Create database to InfluxDB
 ```sh
 docker exec `docker ps | grep -i influx | awk '{print $1}'` influx -execute 'CREATE DATABASE cadvisor'
 ```
 
+#### Create dashboard in Grafana
 Open http://127.0.0.1:9002 or http://172.16.66.11:9002
 
 Default username and password are `admin` and `admin`
 
-In Grafana, create a new data source:
+Create a new data source:
 - Name: `InfluxDB`
 - Type: `InfluxDB`
 - Url: `http://influx:8086`
