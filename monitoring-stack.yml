@@ -1,6 +1,7 @@
 version: '3'
 
 services:
+
   portainer:
     image: portainer/portainer
     command: >
@@ -36,12 +37,16 @@ services:
       restart_policy:
         condition: on-failure
 
-  influx:
-    image: influxdb
+  elasticsearch:
+    image: elasticsearch
+    ports:
+      - 9200:9200
     volumes:
-      - influx:/var/lib/influxdb
+      - elasticsearch:/usr/share/elasticsearch/data
     networks:
       - my_network
+    environment:
+      - ES_JAVA_OPTS=-Xmx256m -Xms256m
     deploy:
       replicas: 1
       placement:
@@ -50,28 +55,64 @@ services:
       restart_policy:
         condition: on-failure
 
-  grafana:
-    image: grafana/grafana
-    ports:
-      - 9002:3000
+  logstash:
+    image: logstash
     volumes:
-      - grafana:/var/lib/grafana
+      - /opt/apps/logstash/conf:/conf
     networks:
       - my_network
+    environment:
+      - LOGSPOUT=ignore
+      - LS_JAVA_OPTS=-Xmx256m -Xms256m
+    command: logstash -f /conf/logstash.conf
     depends_on:
-      - influx
+      - elasticsearch
     deploy:
       replicas: 1
       placement:
         constraints:
           - node.role == manager
+      restart_policy:
+        condition: on-failure
+
+  kibana:
+    image: kibana
+    ports:
+      - 5601:5601
+    networks:
+      - my_network
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+
+  logspout:
+    image: gliderlabs/logspout
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - my_network
+    environment:
+      - SYSLOG_FORMAT=rfc3164
+    command: syslog://logstash:51415
+    depends_on:
+      - logstash
+    deploy:
+      mode: global
       restart_policy:
         condition: on-failure
 
   cadvisor:
     image: google/cadvisor
     hostname: '{{.Node.ID}}'
-    command: -logtostderr -docker_only -storage_driver=influxdb -storage_driver_db=cadvisor -storage_driver_host=influx:8086
+    command: -logtostderr -docker_only -storage_driver=stdout
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:rw
@@ -80,18 +121,16 @@ services:
     networks:
       - my_network
     depends_on:
-      - influx
+      - elasticsearch
     deploy:
       mode: global
       restart_policy:
         condition: on-failure
 
 volumes:
-  influx:
-    driver: local
-  grafana:
-    driver: local
   portainer:
+    driver: local
+  elasticsearch:
     driver: local
 
 networks:

@@ -32,11 +32,9 @@ cd /vagrant
 
 ## Management and monitoring
 
-### Monitoring Docker Swarm with Portainer, Visualizer, cAdvisor, InfluxDB and Grafana
+### Monitoring Docker Swarm with Portainer, Visualizer, cAdvisor, Logspout, Logstash, Elasticsearch and Kibana
 
-Instructions about cAdvisor, InfluxDB and Grafana are taken form:
-https://botleg.com/stories/monitoring-docker-swarm-with-cadvisor-influxdb-and-grafana/
-Github: https://github.com/botleg/swarm-monitoring
+I chose ELK stach because then I can store logs and timeseries in the same storage.
 
 Login to `swarm-node-1` virtual machine (172.16.66.11:22 or 127.0.0.1:2211 with username `vagrant` and password `vagrant`; or `vagrant ssh swarm-node-1`) and execute following commands:
 ```sh
@@ -46,25 +44,19 @@ cd /vagrant
 
 Run `docker stack services monitoring` and verify if all services have all replicas up and running. If not, then wait and look again.
 
-#### Create database to InfluxDB
-```sh
-docker exec `docker ps | grep -i influx | awk '{print $1}'` influx -execute 'CREATE DATABASE cadvisor'
-```
+#### Create dashboards in Kibana
+Open http://127.0.0.1:5601 or http://172.16.66.11:5601
 
-#### Create dashboard in Grafana
-Open http://127.0.0.1:9002 or http://172.16.66.11:9002
+Go to `Management` > `Index Patterns` and add 2 patterns:
+- `swarm-container-stats-*`
+- `swarm-logs-*`
 
-Default username and password are `admin` and `admin`
-
-Create a new data source:
-- Name: `InfluxDB`
-- Type: `InfluxDB`
-- Url: `http://influx:8086`
-- Database: `cadvisor`.
-
-Finally import the `dashboard.json`: click on the logo on the upper left corner -> `Dashboards` -> `Import` -> Import `dashboard.json` -> Select `InfluxDB data source`
+Go to `Management` > `Saved Objects` > `Import` and select `monitoring-dashboard.json`
 
 ### GUIs:
 - Portainer: http://127.0.0.1:9000
 - Visualizer: http://127.0.0.1:9001
-- Grafana: http://127.0.0.1:9002
+- Kibana: http://127.0.0.1:5601
+
+### Alternatives
+- [Monitoring Docker Swarm with cAdvisor, InfluxDB and Grafana](https://botleg.com/stories/monitoring-docker-swarm-with-cadvisor-influxdb-and-grafana/) ([Github](https://github.com/botleg/swarm-monitoring))

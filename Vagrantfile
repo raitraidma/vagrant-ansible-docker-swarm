@@ -1,6 +1,6 @@
 nodes = [
   { :hostname => 'ansible',       :ip => '172.16.66.10', :ram => 512,  :cpus => 1, :ssh => 2210, :ports => {}},
-  { :hostname => 'swarm-node-1',  :ip => '172.16.66.11', :ram => 2048, :cpus => 1, :ssh => 2211, :ports => {9000 => 9000, 9001 => 9001, 9002 => 9002}},
+  { :hostname => 'swarm-node-1',  :ip => '172.16.66.11', :ram => 2048, :cpus => 1, :ssh => 2211, :ports => {9000 => 9000, 9001 => 9001, 5601 => 5601}},
   { :hostname => 'swarm-node-2',  :ip => '172.16.66.12', :ram => 2048, :cpus => 1, :ssh => 2212, :ports => {}},
   { :hostname => 'swarm-node-3',  :ip => '172.16.66.13', :ram => 2048, :cpus => 1, :ssh => 2213, :ports => {}}
 ]
@@ -24,7 +24,7 @@ Vagrant.configure("2") do |config|
       nodeconfig.vm.provider :virtualbox do |vb|
         vb.customize [
           "modifyvm", :id,
-          "--name", node[:hostname],
+#          "--name", node[:hostname],
           "--memory", node[:ram].to_s,
           "--cpus", node[:cpus].to_s
         ]

@@ -7,6 +7,7 @@
 - hosts: swarm-primary-manager
   roles:
     - swarm-primary-manager
+    - logstash
 
 - hosts: swarm-workers
   roles:
